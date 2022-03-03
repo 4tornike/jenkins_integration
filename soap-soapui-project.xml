@@ -505,4 +505,54 @@ return &lt;Name>{data($x/*:Zip)}&lt;/Name>
 }
 &lt;/Result></path><content>&lt;Result>&#13;
   &lt;Name>45968&lt;/Name>&#13;
-&lt;/Result></content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="Sensitive Information Exposure" id="8da13768-8001-427b-9880-55bd43b97445" name="Sensitive Information Exposure"><con:configuration><AssertionSpecificExposureList>password###1234</AssertionSpecificExposureList><AssertionSpecificExposureList>###</AssertionSpecificExposureList><AssertionSpecificExposureList>###</AssertionSpecificExposureList><IncludeProjectSpecific>true</IncludeProjectSpecific><IncludeGlobal>true</IncludeGlobal></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>
+&lt;/Result></content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="Sensitive Information Exposure" id="8da13768-8001-427b-9880-55bd43b97445" name="Sensitive Information Exposure"><con:configuration><AssertionSpecificExposureList>password###1234</AssertionSpecificExposureList><AssertionSpecificExposureList>###</AssertionSpecificExposureList><AssertionSpecificExposureList>###</AssertionSpecificExposureList><IncludeProjectSpecific>true</IncludeProjectSpecific><IncludeGlobal>true</IncludeGlobal></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="jdbc" name="JDBC Request" id="f3be5aa8-1123-4fd7-bb30-fbbee05d87cc"><con:settings/><con:config xsi:type="con:JdbcRequestTestStep" convertColumnNamesToUpperCase="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:driver>com.microsoft.sqlserver.jdbcSQLServerDriver</con:driver><con:connectionString>jdbc:sqlserver://127.0.0.1:1433;username=login;password=1234</con:connectionString><con:query>SELECT TOP (1000) [id]
+      ,[street]
+      ,[city]
+      ,[zip]
+      ,[state]
+  FROM [Person].[dbo].[iso]</con:query><con:assertion type="GroovyScriptAssertion" id="32b5bf11-ae1b-4145-9d92-b8e33557e5f4" name="Script Assertion"><con:configuration><scriptText>def groovyUtils = new com.eviware.soapui.support.GroovyUtils(context)
+
+def holder = groovyUtils.getXmlHolder(messageExchange.responseContent)
+
+def  street1 = holder.getNodeValue("//*:Row[1]/STREET");
+def  city1 = holder.getNodeValue("//*:Row[1]/CITY");
+def  zip1 = holder.getNodeValue("//*:Row[1]/ZIP");
+def  state1 = holder.getNodeValue("//*:Row[1]/state");
+
+def  street2 = holder.getNodeValue("//*:Row[2]/STREET");
+def  city2 = holder.getNodeValue("//*:Row[2]/CITY");
+def  zip2 = holder.getNodeValue("//*:Row[2]/ZIP");
+def  state2 = holder.getNodeValue("//*:Row[2]/state");
+
+log.info "the result value for integers is" + state2
+
+def testCaseName = 'TestCase 1'
+def testStepName = 'FindPerson'
+def response = context.testCase.testSuite.testCases[testCaseName].testSteps[testStepName].testRequest.responseContent
+
+log.info "resopnse is" + response
+
+def holder2 = groovyUtils.getXmlHolder(response)
+
+def homeStreet = holder2.getNodeValue("//*:Home/*:Street")
+def homeCity = holder2.getNodeValue("//*:Home/*:City")
+def homeState = holder2.getNodeValue("//*:Home/*:State")
+def homeZip = holder2.getNodeValue("//*:Home/*:Zip")
+
+def officeStreet = holder2.getNodeValue("//*:Office/*:Street")
+def officeCity = holder2.getNodeValue("//*:Office/*:City")
+def officeState = holder2.getNodeValue("//*:Office/*:State")
+def officeZip = holder2.getNodeValue("//*:Office/*:Zip")
+
+//
+//assert street1 == homeStreet
+assert city1 == homeCity
+assert zip1 == homeZip
+assert state1 == homeState
+assert street2 == officeStreet
+assert city2 == officeCity
+assert zip2 == officeZip
+assert state2 == officeState
+ 
+
+</scriptText></con:configuration></con:assertion><con:properties/></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
